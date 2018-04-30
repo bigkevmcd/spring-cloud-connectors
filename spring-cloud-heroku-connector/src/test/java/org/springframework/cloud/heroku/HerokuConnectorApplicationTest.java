@@ -46,4 +46,23 @@ public class HerokuConnectorApplicationTest extends AbstractHerokuConnectorTest 
 		assertEquals("web.1", testCloudConnector.getApplicationInstanceInfo().getInstanceId());
 	}
 
+	@Test
+	public void applicationInstanceInfoWithHerokuDynoMetadata() {
+		when(mockEnvironment.getEnvValue("HEROKU_APP_NAME")).thenReturn("myapp");
+		when(mockEnvironment.getEnvValue("HEROKU_APP_ID")).thenReturn("9daa2797-e49b-4624-932f-ec3f9688e3da");
+		when(mockEnvironment.getEnvValue("HEROKU_DYNO_ID")).thenReturn("1vac4117-c29f-4312-521e-ba4d8638c1ac");
+		when(mockEnvironment.getEnvValue("HEROKU_RELEASE_CREATED_AT")).thenReturn("2015-04-02T18:00:42Z");
+		when(mockEnvironment.getEnvValue("HEROKU_RELEASE_VERSION")).thenReturn("v42");
+		when(mockEnvironment.getEnvValue("HEROKU_SLUG_COMMIT")).thenReturn("2c3a0b24069af49b3de35b8e8c26765c1dba9ff0");
+		when(mockEnvironment.getEnvValue("HEROKU_SLUG_DESCRIPTION")).thenReturn("Deploy 2c3a0b2");
+
+		assertEquals("myapp", testCloudConnector.getApplicationInstanceInfo().getAppId());
+		Map<String, Object> appProps = testCloudConnector.getApplicationInstanceInfo().getProperties();
+		assertEquals("9daa2797-e49b-4624-932f-ec3f9688e3da", appProps.get("heroku.app.id"));
+		assertEquals("1vac4117-c29f-4312-521e-ba4d8638c1ac", appProps.get("heroku.dyno.id"));
+		assertEquals("2015-04-02T18:00:42Z", appProps.get("heroku.release.created_at"));
+		assertEquals("v42", appProps.get("heroku.release.version"));
+		assertEquals("2c3a0b24069af49b3de35b8e8c26765c1dba9ff0", appProps.get("heroku.slug.commit"));
+		assertEquals("Deploy 2c3a0b2", appProps.get("heroku.slug.description"));
+	}
 }
